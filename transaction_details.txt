@@ -1,0 +1,3 @@
+TXID_A_TO_B=2d24f56dddab76e2fd77ba6ae6e815e3cd56db1ad7601ba777875928cebdda07
+ADDR_B=mxbe7umSy4nt78rZqgETTb6RkCkpCCwWBe
+ADDR_C=mj7wcG5vpmrXbUr9pUmfTnBT97Y5uCZAHh
