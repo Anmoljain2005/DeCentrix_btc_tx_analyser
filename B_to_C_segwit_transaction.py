@@ -14,7 +14,7 @@ rpc_connection = AuthServiceProxy(f"http://{rpc_user}:{rpc_password}@{rpc_host}:
 # Read transaction details from previous script
 tx_details = {}
 try:
-    with open("segwit_transaction_details.txt", "r") as f:
+    with open("Segwit_transaction_details.txt", "r") as f:
         for line in f:
             key, value = line.strip().split("=", 1)
             tx_details[key] = value

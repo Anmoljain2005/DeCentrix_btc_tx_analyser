@@ -95,10 +95,10 @@ rpc_connection.generatetoaddress(1, mining_address)
 print("Mined 1 block to confirm A' to B' transaction")
 
 # Save transaction details for use in the next script
-with open("segwit_transaction_details.txt", "w") as f:
+with open("Segwit_transaction_details.txt", "w") as f:
     f.write(f"TXID_A_TO_B_SEGWIT={tx_id}\n")
     f.write(f"ADDR_B_SEGWIT={addr_b_segwit}\n")
     f.write(f"ADDR_C_SEGWIT={addr_c_segwit}\n")
 
-print("\nTransaction details saved to segwit_transaction_details.txt")
+print("\nTransaction details saved to Segwit_transaction_details.txt")
 print("\nTransaction from A' to B' completed successfully!")
