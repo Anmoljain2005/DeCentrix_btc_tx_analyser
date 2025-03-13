@@ -128,6 +128,13 @@ python B_to_C_legacy_transaction.py
 
 3. **Run SegWit Transactions**  
 
+- **Restart regtest mode** before running SegWit transactions:  
+
+```bash
+cd "C:/Program Files/Bitcoin/daemon"
+.\bitcoind -regtest
+```
+
 - Transaction from SegWit address A' to B':  
 ```bash
 python A_to_B_segwit_transaction.py
