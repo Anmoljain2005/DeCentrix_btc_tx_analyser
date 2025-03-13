@@ -53,7 +53,7 @@ To run Bitcoin Core in regtest mode, you need to configure the `bitcoin.conf` fi
    - Add the following configuration to the file:
 
    ```ini
-[regtest]
+regtest
 rpcuser=decentrix_crew
 rpcpassword=decentrix
 rpcport=18443
