@@ -80,7 +80,7 @@ txconfirmtarget=6
 
 ## Running Bitcoin Core in Regtest Mode (On Windows)
  
-### Open Command Prompt or PowerShell and cd into the installed directory. 
+### Open Command Prompt or PowerShell and `cd` into the installed directory. 
 
 ```bash
 cd "C:/Program Files/Bitcoin/daemon"
@@ -110,8 +110,8 @@ This repository contains four Python scripts:
 1. **Clone the Repository**  
 
 ```bash
-git clone https://github.com/yourusername/your_repository_name.git
-cd your_repository_name
+git clone https://github.com/Anmoljain2005/DeCentrix_btc_tx_analyser.git
+cd DeCentrix_btc_tx_analyser
 ```
 
 2. **Run Legacy Transactions**  
