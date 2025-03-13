@@ -78,32 +78,21 @@ txconfirmtarget=6
 
 ---
 
-## Running Bitcoin Core in Regtest Mode
-
-### 1. Start `bitcoind` in Regtest Mode  
-Run the following command:  
-
-```bash
-bitcoind -regtest -daemon
-```
-
-This will start the Bitcoin daemon in regtest mode.  
-
-### 2. Check if `bitcoind` is Running  
-Use the following command to check if `bitcoind` is running:  
+## Running Bitcoin Core in Regtest Mode (On Windows)
+ 
+### Open Command Prompt or PowerShell and cd into the installed directory. 
 
 ```bash
-bitcoin-cli -regtest getblockchaininfo
-```
+cd "C:/Program Files/Bitcoin/daemon"
+``` 
 
-You should see information about the regtest blockchain.  
-
-### 3. Generate Blocks  
-Generate 101 blocks (to mature coinbase transactions):  
+### Start the daemon by entering , 
 
 ```bash
-bitcoin-cli -regtest generatetoaddress 101 $(bitcoin-cli -regtest getnewaddress)
+.\bitcoind -regtest
 ```
+
+Now your bitcoin node is running in regtest mode.   
 
 ---
 
@@ -206,4 +195,3 @@ This Bitcoin Scripting Assignment is part of the course **CS-216: Introduction t
 
 **Happy Scripting!** 🚀  
 
---- 
