@@ -11,7 +11,7 @@ This repository contains the code and instructions for the Bitcoin Scripting Ass
 5. [Running the Scripts](#running-the-scripts)
 6. [Script Descriptions](#script-descriptions)
 7. [Report and Analysis](#report-and-analysis)
-8. [Contributors](#contributors)
+8. [Acknowledgements](#acknowledgements)
 
 ---
 
@@ -53,17 +53,20 @@ To run Bitcoin Core in regtest mode, you need to configure the `bitcoin.conf` fi
    - Add the following configuration to the file:
 
    ```ini
-   regtest=1
-   server=1
-   rpcuser=decentrix_crew
-   rpcpassword=decentrix
-   rpcport=18443
-   rpcallowip=127.0.0.1
-   txindex=1
+[regtest]
+rpcuser=decentrix_crew
+rpcpassword=decentrix
+rpcport=18443
+server=1
+txindex=1
+paytxfee=0.0001
+fallbackfee=0.0002
+mintxfee=0.00001
+txconfirmtarget=6
    ```
 
    - **Explanation**:
-     - `regtest=1`: Enables regtest mode (local blockchain for testing).
+     - `[regtest]`: Enables regtest mode (local blockchain for testing).
      - `server=1`: Allows RPC connections.
      - `rpcuser` and `rpcpassword`: Credentials for RPC authentication.
      - `rpcport=18443`: Port for RPC connections in regtest mode.
@@ -174,20 +177,14 @@ The report includes:
 
 ## Contributors
 
-- [Your Name](https://github.com/yourusername)
-- [Team Member 2](https://github.com/teammember2)
-- [Team Member 3](https://github.com/teammember3)
+- [Anmol Jain](https://github.com/Anmoljain2005) : 230008009
+- [Priyanshu Patel](https://github.com/Priyanshu7058) : 230008026
+- [Mitanshu Kumawat](https://github.com/MitanshuKumawat) : 230008022
 
 ---
 
-## License
+## Acknowledgements
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-For any questions or issues, please open an issue in the repository or contact the contributors.
-
----
+This Bitcoin Scripting Assignment is a part of the course CS-216 Introduction to Blockchain under the guidance of Dr. Subhra Mazumdar.
 
 **Happy Scripting!** 🚀
