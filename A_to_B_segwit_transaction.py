@@ -13,11 +13,16 @@ rpc_connection = AuthServiceProxy(f"http://{rpc_user}:{rpc_password}@{rpc_host}:
 # Load wallet
 wallet_name = "DeCentrixStore"
 try:
-    rpc_connection.loadwallet(wallet_name)
-    print(f"Wallet {wallet_name} loaded successfully.")
+    # Try to create a new wallet
+    rpc_connection.createwallet(wallet_name)
+    print(f"Created new wallet: {wallet_name}")
 except Exception as e:
-    print(f"Error loading wallet: {e}")
-    exit(1)
+    # If wallet already exists, load it
+    if "already exists" in str(e):
+        print(f"Wallet {wallet_name} already exists, loading it...")
+        rpc_connection.loadwallet(wallet_name)
+    else:
+        print(f"Error: {e}")
 
 # Switch to the wallet
 rpc_connection = AuthServiceProxy(f"http://{rpc_user}:{rpc_password}@{rpc_host}:{rpc_port}/wallet/{wallet_name}")
