@@ -1,5 +1,4 @@
 from bitcoinrpc.authproxy import AuthServiceProxy
-import subprocess  # Import subprocess to run btcdeb
 
 # Connection details
 rpc_user = 'decentrix_crew'
@@ -59,7 +58,6 @@ else:
     print(f"Using first available UTXO instead: {utxo['txid']} with amount {utxo['amount']} BTC")
 
 # Create a raw transaction
-# Let Bitcoin Core calculate the fee based on txconfirmtarget=6
 raw_tx = rpc_connection.createrawtransaction(
     [{"txid": utxo['txid'], "vout": utxo['vout']}],
     {addr_c: float(utxo['amount'])}  # Send the full amount, let Bitcoin Core calculate the fee
@@ -122,18 +120,6 @@ if decoded_locking_script['type'] == 'pubkeyhash' and decoded_unlocking_script['
 else:
     print("Error: The scripts do not match the expected P2PKH structure.")
     exit(1)
-
-# # Run btcdeb to debug the scripts
-# print("\nRunning btcdeb to debug the scripts...")
-# combined_script = f"{decoded_tx_after['vin'][0]['scriptSig']['asm']} {prev_tx['vout'][utxo['vout']]['scriptPubKey']['asm']}"
-# try:
-#     result = subprocess.run(["btcdeb", combined_script], capture_output=True, text=True, check=True)
-#     print("btcdeb output:")
-#     print(result.stdout)
-# except subprocess.CalledProcessError as e:
-#     print("Error running btcdeb:")
-#     print(e.stderr)
-#     exit(1)
 
 # Broadcast the transaction
 tx_id = rpc_connection.sendrawtransaction(signed_tx['hex'])

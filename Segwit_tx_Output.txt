@@ -1,0 +1,72 @@
+PS D:\Projects\DeCentrix_btc_tx_analyser> python A_to_B_segwit_transaction.py
+Wallet DeCentrixStore already exists, loading it...
+Address A (P2SH-SegWit): 2MzPAMrRR77bGAt4J4kXhTvWL4pa7P67419
+Address B (P2SH-SegWit): 2N15ACUy7D1qudoS5yV8uG4Mb9egN2LimBN
+Address C (P2SH-SegWit): 2NFt2wgx6Z2WNa9DwCRAn8TtDupfoWURWK7
+Generated 101 blocks to mi7tEGjH7ViSuNT5oW4am2uzpSUvSNSJR7
+Funded Address A with 1.0 BTC, TXID: 3f846546077d04ec5d93bb0802589b3e9c5348521591a0a5f8be2062c098bdf3
+Mined 1 block to confirm funding transaction
+Using UTXO: 3f846546077d04ec5d93bb0802589b3e9c5348521591a0a5f8be2062c098bdf3 with amount 1.00000000 BTC
+
+Estimated fee for txconfirmtarget=6: 0.00005120 BTC
+
+Decoded Funded Raw Transaction:
+Transaction ID: e97689e6aa166c5eb600e6c856c1b779597e20f235f5e0f5f570da5111a122d0
+Input TXID: 3f846546077d04ec5d93bb0802589b3e9c5348521591a0a5f8be2062c098bdf3
+Output address: 2MxMrHg1y87mutGgD1FZrDuG1zDt7SUZNV3
+Output amount: 0.01204463 BTC
+
+Transaction signed successfully!
+
+Transaction from A to B broadcasted with TXID: db9c80440a872eb2973ec5a9eb39a6214bfa4b254efa5ad4f4b561d4060df63e
+Mined 1 block to confirm A to B transaction
+
+Transaction details saved to Segwit_transaction_details.txt
+
+Transaction from A to B completed successfully!
+PS D:\Projects\DeCentrix_btc_tx_analyser> python B_to_C_segwit_transaction.py
+Loaded transaction details from file:
+TXID A' to B': db9c80440a872eb2973ec5a9eb39a6214bfa4b254efa5ad4f4b561d4060df63e
+Address B': 2N15ACUy7D1qudoS5yV8uG4Mb9egN2LimBN
+Address C': 2NFt2wgx6Z2WNa9DwCRAn8TtDupfoWURWK7
+Found UTXO from A' to B' transaction: db9c80440a872eb2973ec5a9eb39a6214bfa4b254efa5ad4f4b561d4060df63e with amount 1.00000000 BTC
+
+Estimated fee for txconfirmtarget=6: 0.00005120 BTC
+
+Decoded Raw Transaction (before signing):
+Transaction ID: dddf75a83afe92ccbf6495684c4abdd1753301e5f8de0ede6d72785a5c7dbda9
+Input TXID: db9c80440a872eb2973ec5a9eb39a6214bfa4b254efa5ad4f4b561d4060df63e
+Output address: 2NFt2wgx6Z2WNa9DwCRAn8TtDupfoWURWK7
+Output amount: 1.00000000 BTC
+ScriptPubKey (Locking Script) for Address C': a914f848f02acab4efe61931175a9bd2e61063e3eec987
+ScriptPubKey ASM: OP_HASH160 f848f02acab4efe61931175a9bd2e61063e3eec9 OP_EQUAL
+Script type: scripthash
+
+Transaction signed successfully!
+
+Decoded Signed Transaction (after signing):
+ScriptSig (Unlocking Script): 160014cb9ee2ff947d4b99f8688fd2599a024acb7ad800
+ScriptSig ASM: 0014cb9ee2ff947d4b99f8688fd2599a024acb7ad800
+
+Witness data found (SegWit):
+Witness item 0: 3044022021349fd89b241c7b941578eb4ea19ae6c7c6cc87bf03df45aaae117274ae3b7202203295fe0f573d269415875d0d8c4aa0172b7ec45184727dd8e3b3ce672f803b2b01
+Witness item 1: 02a2c515987cacb121201e916c4fa8e6982fc34e8d92b1d057d1694524c1f8b23d
+
+Previous Transaction ScriptPubKey (Challenge Script):
+ScriptPubKey: a91455d9aee5cce467721910c2a9fb3e5c20070bec7687
+ScriptPubKey ASM: OP_HASH160 55d9aee5cce467721910c2a9fb3e5c20070bec76 OP_EQUAL
+Script type: scripthash
+
+Analysis of Challenge-Response Scripts:
+Challenge (ScriptPubKey): OP_HASH160 55d9aee5cce467721910c2a9fb3e5c20070bec76 OP_EQUAL
+Response (ScriptSig): 0014cb9ee2ff947d4b99f8688fd2599a024acb7ad800
+
+In P2SH-P2WPKH (SegWit) transactions, the signature and public key are moved to the witness data
+This reduces the transaction size and fixes transaction malleability issues
+
+Transaction size in bytes: 418
+
+Transaction from B' to C' broadcasted with TXID: 330e163ad65e4972cd38327fa7e7cd5e802471088bec840b8c2479157fb6a9b3
+Mined 1 block to confirm B' to C' transaction
+
+Transaction from B' to C' completed successfully!

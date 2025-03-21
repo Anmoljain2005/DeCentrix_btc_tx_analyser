@@ -12,9 +12,10 @@ This repository contains the code and instructions for the Bitcoin Scripting Ass
 4. [Running Bitcoin Core in Regtest Mode](#running-bitcoin-core-in-regtest-mode)  
 5. [Running the Scripts](#running-the-scripts)  
 6. [Script Descriptions](#script-descriptions)  
-7. [Report and Analysis](#report-and-analysis)  
-8. [Contributors](#contributors)  
-9. [Acknowledgements](#acknowledgements)  
+7. [Validating Scripts Using Bitcoin Debugger (`btcdeb`)](#validating-scripts-using-bitcoin-debugger-btcdeb)  
+8. [Report and Analysis](#report-and-analysis)  
+9. [Contributors](#contributors)  
+10. [Acknowledgements](#acknowledgements)  
 
 ---
 
@@ -175,6 +176,46 @@ python B_to_C_segwit_transaction.py
 
 ---
 
+## Validating Scripts Using Bitcoin Debugger (`btcdeb`)
+
+To validate the correctness of the **challenge and response scripts**, you can use the **Bitcoin Debugger (`btcdeb`)**. The debugger allows you to step through the execution of Bitcoin scripts and verify their behavior.
+
+### Steps to Use `btcdeb`
+
+1. **Access the Debugger**  
+   - For Linux users, log in to the server using the following credentials:  
+     ```bash
+     ssh -x guest@10.206.4.201
+     ```
+     Password: `root1234`  
+
+2. **Run `btcdeb`**  
+   - Once logged in, use the `btcdeb` command to debug your scripts.  
+   - For **Legacy (P2PKH)** transactions:  
+     ```bash
+     btcdeb -v ['<unlocking_script> <locking_script>']
+     ```  
+     Example:  
+     ```bash
+     btcdeb -v ['3044022051941caacc410b9c7915bc64f68d063b6b83bcb3de869e9fa86290c05856392e02203567b8100e0fd3d75ad8554e52ea22a636169167195be92ee75c4f641ca2f2ad01 031a60a21ad8396e2c1c2666af6913e2c78222203374c087c5cb419e2796119efe OP_DUP OP_HASH160 328bf4de42d6440fb40a4e059b747a12ac200200 OP_EQUALVERIFY OP_CHECKSIG']
+     ```  
+
+   - For **SegWit (P2SH-P2WPKH)** transactions:  
+     ```bash
+     btcdeb -v ['<witness_item_0> <witness_item_1> <locking_script>']
+     ```  
+     Example:  
+     ```bash
+     btcdeb -v ['3044022021349fd89b241c7b941578eb4ea19ae6c7c6cc87bf03df45aaae117274ae3b7202203295fe0f573d269415875d0d8c4aa0172b7ec45184727dd8e3b3ce672f803b2b01 02a2c515987cacb121201e916c4fa8e6982fc34e8d92b1d057d1694524c1f8b23d OP_HASH160 55d9aee5cce467721910c2a9fb3e5c20070bec76 OP_EQUAL']
+     ```  
+
+3. **Analyze the Output**  
+   - The debugger will simulate the execution of the script step by step.  
+   - If the script is valid, the final stack will contain `1` (true).  
+   - If the script is invalid, the debugger will highlight the error.  
+
+---
+
 ## Report and Analysis
 
 The report includes:  
@@ -201,4 +242,3 @@ This Bitcoin Scripting Assignment is part of the course **CS-216: Introduction t
 ---
 
 **Happy Scripting!** 🚀  
-

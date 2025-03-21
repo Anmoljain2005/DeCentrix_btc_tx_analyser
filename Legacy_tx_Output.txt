@@ -1,0 +1,67 @@
+PS D:\Projects\DeCentrix_btc_tx_analyser> python A_to_B_legacy_transaction.py
+Wallet DeCentrixStore already exists, loading it...
+Address A (Legacy): mrQ9Ursai3mdv4qQxdYNmmJ8qjS5aD2VQA
+Address B (Legacy): mk8DjzehoSWGAnkWyQzu5tbFNMjakndyah
+Address C (Legacy): mhA8PP3B2wKQJnENekT9uArTJtFYr1ATS4
+Generated 101 blocks to mskSahTzBHVGkzZTKSXpBvXy5J7XsNu2Ff
+Funded Address A with 1.0 BTC, TXID: 2a9b025347a28ca5bab99783e1c5b458360b260abbd264846ecae31313221cbe
+Mined 1 block to confirm funding transaction
+Using UTXO: 2a9b025347a28ca5bab99783e1c5b458360b260abbd264846ecae31313221cbe with amount 1.00000000 BTC
+
+Estimated fee for txconfirmtarget=6: 0.00007440 BTC
+
+Decoded Funded Raw Transaction:
+Transaction ID: 76b74341c04d3a6a7ec827e9fa388891122cad4c4a4bfa6f2afe05d7cfbc6620
+Input TXID: 2a9b025347a28ca5bab99783e1c5b458360b260abbd264846ecae31313221cbe
+Output address: mqimvZpW7uHATVJLUwTHQpP8d8ZBftGxbm
+Output amount: 0.01220703 BTC
+
+Transaction signed successfully!
+
+Transaction from A to B broadcasted with TXID: 4242aeff66ebb087073bf59b08ad571f3db97d5519f5e61564cd09e3b3258ce2
+Mined 1 block to confirm A to B transaction
+
+Transaction details saved to Legacy_transaction_details.txt
+
+Transaction from A to B completed successfully!
+PS D:\Projects\DeCentrix_btc_tx_analyser> python B_to_C_legacy_transaction.py
+Loaded transaction details from file:
+TXID A to B: 4242aeff66ebb087073bf59b08ad571f3db97d5519f5e61564cd09e3b3258ce2
+Address B: mk8DjzehoSWGAnkWyQzu5tbFNMjakndyah
+Address C: mhA8PP3B2wKQJnENekT9uArTJtFYr1ATS4
+Found UTXO from A to B transaction: 4242aeff66ebb087073bf59b08ad571f3db97d5519f5e61564cd09e3b3258ce2 with amount 1.00000000 BTC
+
+Estimated fee for txconfirmtarget=6: 0.00007440 BTC
+
+Decoded Raw Transaction (before signing):
+Transaction ID: 749b5dcbf3e2a242ba51fcbe2cbf01e827cc2c0312f4c8753142ca40b975c84e
+Input TXID: 4242aeff66ebb087073bf59b08ad571f3db97d5519f5e61564cd09e3b3258ce2
+Output address: mhA8PP3B2wKQJnENekT9uArTJtFYr1ATS4
+Output amount: 1.00000000 BTC
+ScriptPubKey (Locking Script) for Address C: 76a91411fff0cc181cd5f10a3b8f187358ec6ee1a029cc88ac
+ScriptPubKey ASM: OP_DUP OP_HASH160 11fff0cc181cd5f10a3b8f187358ec6ee1a029cc OP_EQUALVERIFY OP_CHECKSIG
+
+Transaction signed successfully!
+
+Decoded Signed Transaction (after signing):
+ScriptSig (Unlocking Script): 473044022051941caacc410b9c7915bc64f68d063b6b83bcb3de869e9fa86290c05856392e02203567b8100e0fd3d75ad8554e52ea22a636169167195be92ee75c4f641ca2f2ad0121031a60a21ad8396e2c1c2666af6913e2c78222203374c087c5cb419e2796119efe
+ScriptSig ASM: 3044022051941caacc410b9c7915bc64f68d063b6b83bcb3de869e9fa86290c05856392e02203567b8100e0fd3d75ad8554e52ea22a636169167195be92ee75c4f641ca2f2ad[ALL] 031a60a21ad8396e2c1c2666af6913e2c78222203374c087c5cb419e2796119efe
+
+Previous Transaction ScriptPubKey (Challenge Script):
+ScriptPubKey: 76a914328bf4de42d6440fb40a4e059b747a12ac20020088ac
+ScriptPubKey ASM: OP_DUP OP_HASH160 328bf4de42d6440fb40a4e059b747a12ac200200 OP_EQUALVERIFY OP_CHECKSIG
+
+Decoded Locking Script (ScriptPubKey):
+{'asm': 'OP_DUP OP_HASH160 328bf4de42d6440fb40a4e059b747a12ac200200 OP_EQUALVERIFY OP_CHECKSIG', 'desc': 'addr(mk8DjzehoSWGAnkWyQzu5tbFNMjakndyah)#pe090tuh', 'address': 'mk8DjzehoSWGAnkWyQzu5tbFNMjakndyah', 'type': 'pubkeyhash', 'p2sh': '2NBEtXNhJE4yPaQTK4T7paqhEiF2HDRjHXX', 'segwit': {'asm': '0 328bf4de42d6440fb40a4e059b747a12ac200200', 'desc': 'addr(bcrt1qx29lfhjz6ezqldq2fczekar6z2kzqqsqwmq7nn)#tmvhpftc', 'hex': '0014328bf4de42d6440fb40a4e059b747a12ac200200', 'address': 'bcrt1qx29lfhjz6ezqldq2fczekar6z2kzqqsqwmq7nn', 'type': 'witness_v0_keyhash', 'p2sh-segwit': '2N9T5F72b2Bag5BB9gdXhAb4gh6mitBSXP2'}}
+
+Decoded Unlocking Script (ScriptSig):
+{'asm': '3044022051941caacc410b9c7915bc64f68d063b6b83bcb3de869e9fa86290c05856392e02203567b8100e0fd3d75ad8554e52ea22a636169167195be92ee75c4f641ca2f2ad01 031a60a21ad8396e2c1c2666af6913e2c78222203374c087c5cb419e2796119efe', 'desc': 'raw(473044022051941caacc410b9c7915bc64f68d063b6b83bcb3de869e9fa86290c05856392e02203567b8100e0fd3d75ad8554e52ea22a636169167195be92ee75c4f641ca2f2ad0121031a60a21ad8396e2c1c2666af6913e2c78222203374c087c5cb419e2796119efe)#rar0vyeg', 'type': 'nonstandard', 'p2sh': '2N7P8F8rgYTRoJuxkPA23kC4pSZ74no9uxD', 'segwit': {'asm': '0 85965478b446338537a9f4f8e9f4b78dedec7cfbd6ae51ccc57a4816daacbecf', 'desc': 'addr(bcrt1qskt9g795gcec2daf7nuwna9h3hk7cl8m66h9rnx90fypdk4vhm8s83eztt)#fjnsk723', 'hex': '002085965478b446338537a9f4f8e9f4b78dedec7cfbd6ae51ccc57a4816daacbecf', 'address': 'bcrt1qskt9g795gcec2daf7nuwna9h3hk7cl8m66h9rnx90fypdk4vhm8s83eztt', 'type': 'witness_v0_scripthash', 'p2sh-segwit': '2NAnZSJqqnKUieSx6eqQpvK6ekuahrn8XaL'}}
+
+Validating ScriptSig against ScriptPubKey...
+The locking script is P2PKH, and the unlocking script provides a signature and public key.
+This matches the expected structure for a P2PKH transaction.
+
+Transaction from B to C broadcasted with TXID: 8e2c561d135074db2cb0b55cdd281665a706c5201bff65781f2638796dfb052c
+Mined 1 block to confirm B to C transaction
+
+Transaction from B to C completed successfully!

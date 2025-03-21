@@ -1,5 +1,4 @@
 from bitcoinrpc.authproxy import AuthServiceProxy
-import subprocess  # Import subprocess to run btcdeb
 
 # Connection details
 rpc_user = 'decentrix_crew'
@@ -137,22 +136,5 @@ print(f"\nTransaction from B' to C' broadcasted with TXID: {tx_id}")
 # Mine a block to confirm the transaction
 rpc_connection.generatetoaddress(1, mining_address)
 print("Mined 1 block to confirm B' to C' transaction")
-
-# # Run btcdeb to debug the scripts
-# print("\nRunning btcdeb to debug the scripts...")
-# if 'scriptSig' in decoded_tx_after['vin'][0]:
-#     combined_script = f"{decoded_tx_after['vin'][0]['scriptSig']['asm']} {prev_tx['vout'][utxo['vout']]['scriptPubKey']['asm']}"
-# else:
-#     # For SegWit transactions, use witness data
-#     combined_script = f"{' '.join(decoded_tx_after['vin'][0]['txinwitness'])} {prev_tx['vout'][utxo['vout']]['scriptPubKey']['asm']}"
-
-# try:
-#     result = subprocess.run(["btcdeb", combined_script], capture_output=True, text=True, check=True)
-#     print("btcdeb output:")
-#     print(result.stdout)
-# except subprocess.CalledProcessError as e:
-#     print("Error running btcdeb:")
-#     print(e.stderr)
-#     exit(1)
 
 print("\nTransaction from B' to C' completed successfully!")
