@@ -1,5 +1,5 @@
 from bitcoinrpc.authproxy import AuthServiceProxy
-from decimal import Decimal
+import subprocess  # Import subprocess to run btcdeb
 
 # Connection details
 rpc_user = 'decentrix_crew'
@@ -19,9 +19,9 @@ try:
             key, value = line.strip().split("=", 1)
             tx_details[key] = value
     
-    txid_a_to_b = tx_details["TXID_A_TO_B_SEGWIT"]
-    addr_b = tx_details["ADDR_B_SEGWIT"]
-    addr_c = tx_details["ADDR_C_SEGWIT"]
+    txid_a_to_b = tx_details["TXID_A_TO_B"]
+    addr_b = tx_details["ADDR_B"]
+    addr_c = tx_details["ADDR_C"]
     
     print(f"Loaded transaction details from file:")
     print(f"TXID A' to B': {txid_a_to_b}")
@@ -46,28 +46,35 @@ if not unspent:
         exit(1)
 
 # Find the specific UTXO from the A' to B' transaction
-for utxo in unspent:
-    if utxo['txid'] == txid_a_to_b:
+utxo = None
+for u in unspent:
+    if u['txid'] == txid_a_to_b:
+        utxo = u
         print(f"Found UTXO from A' to B' transaction: {utxo['txid']} with amount {utxo['amount']} BTC")
         break
 else:
     print(f"Could not find UTXO with TXID {txid_a_to_b}. Available UTXOs:")
-    for utxo in unspent:
-        print(f"  TXID: {utxo['txid']}, Amount: {utxo['amount']} BTC")
+    for u in unspent:
+        print(f"  TXID: {u['txid']}, Amount: {u['amount']} BTC")
     # Use the first available UTXO as fallback
     utxo = unspent[0]
     print(f"Using first available UTXO instead: {utxo['txid']} with amount {utxo['amount']} BTC")
 
 # Create a raw transaction
-# Use Decimal for the fee to match the type returned by RPC
-amount_to_send = utxo['amount'] - Decimal('0.0001')  # Subtract a small fee
 raw_tx = rpc_connection.createrawtransaction(
     [{"txid": utxo['txid'], "vout": utxo['vout']}],
-    {addr_c: float(amount_to_send)}  # Convert back to float for createrawtransaction
+    {addr_c: float(utxo['amount'])}  # Send the full amount, let Bitcoin Core calculate the fee
 )
 
+# Fund the raw transaction (let Bitcoin Core add the fee)
+funded_tx = rpc_connection.fundrawtransaction(raw_tx, {"conf_target": 6})
+funded_raw_tx = funded_tx['hex']
+fee_amount = funded_tx['fee']
+
+print(f"\nEstimated fee for txconfirmtarget=6: {fee_amount} BTC")
+
 # Decode the raw transaction to analyze it before signing
-decoded_tx_before = rpc_connection.decoderawtransaction(raw_tx)
+decoded_tx_before = rpc_connection.decoderawtransaction(funded_raw_tx)
 print("\nDecoded Raw Transaction (before signing):")
 print(f"Transaction ID: {decoded_tx_before['txid']}")
 print(f"Input TXID: {decoded_tx_before['vin'][0]['txid']}")
@@ -78,7 +85,7 @@ print(f"ScriptPubKey ASM: {decoded_tx_before['vout'][0]['scriptPubKey']['asm']}"
 print(f"Script type: {decoded_tx_before['vout'][0]['scriptPubKey']['type']}")
 
 # Sign the transaction
-signed_tx = rpc_connection.signrawtransactionwithwallet(raw_tx)
+signed_tx = rpc_connection.signrawtransactionwithwallet(funded_raw_tx)
 if signed_tx['complete']:
     print("\nTransaction signed successfully!")
 else:
@@ -120,7 +127,6 @@ if 'txinwitness' in decoded_tx_after['vin'][0]:
     print("This reduces the transaction size and fixes transaction malleability issues")
 
 # Get the transaction virtual size for analysis
-tx_info = rpc_connection.decoderawtransaction(signed_tx['hex'])
 tx_size = len(signed_tx['hex']) // 2  # hex string to bytes
 print(f"\nTransaction size in bytes: {tx_size}")
 
@@ -131,5 +137,22 @@ print(f"\nTransaction from B' to C' broadcasted with TXID: {tx_id}")
 # Mine a block to confirm the transaction
 rpc_connection.generatetoaddress(1, mining_address)
 print("Mined 1 block to confirm B' to C' transaction")
+
+# # Run btcdeb to debug the scripts
+# print("\nRunning btcdeb to debug the scripts...")
+# if 'scriptSig' in decoded_tx_after['vin'][0]:
+#     combined_script = f"{decoded_tx_after['vin'][0]['scriptSig']['asm']} {prev_tx['vout'][utxo['vout']]['scriptPubKey']['asm']}"
+# else:
+#     # For SegWit transactions, use witness data
+#     combined_script = f"{' '.join(decoded_tx_after['vin'][0]['txinwitness'])} {prev_tx['vout'][utxo['vout']]['scriptPubKey']['asm']}"
+
+# try:
+#     result = subprocess.run(["btcdeb", combined_script], capture_output=True, text=True, check=True)
+#     print("btcdeb output:")
+#     print(result.stdout)
+# except subprocess.CalledProcessError as e:
+#     print("Error running btcdeb:")
+#     print(e.stderr)
+#     exit(1)
 
 print("\nTransaction from B' to C' completed successfully!")

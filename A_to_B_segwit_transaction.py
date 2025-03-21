@@ -1,5 +1,4 @@
 from bitcoinrpc.authproxy import AuthServiceProxy
-from decimal import Decimal
 
 # Connection details
 rpc_user = 'decentrix_crew'
@@ -10,14 +9,12 @@ rpc_port = 18443
 # Connect to Bitcoin daemon
 rpc_connection = AuthServiceProxy(f"http://{rpc_user}:{rpc_password}@{rpc_host}:{rpc_port}")
 
-# Load wallet
+# Create or load wallet
 wallet_name = "DeCentrixStore"
 try:
-    # Try to create a new wallet
     rpc_connection.createwallet(wallet_name)
     print(f"Created new wallet: {wallet_name}")
 except Exception as e:
-    # If wallet already exists, load it
     if "already exists" in str(e):
         print(f"Wallet {wallet_name} already exists, loading it...")
         rpc_connection.loadwallet(wallet_name)
@@ -28,58 +25,62 @@ except Exception as e:
 rpc_connection = AuthServiceProxy(f"http://{rpc_user}:{rpc_password}@{rpc_host}:{rpc_port}/wallet/{wallet_name}")
 
 # Generate three P2SH-SegWit addresses
-# Using "p2sh-segwit" address type which is P2SH-P2WPKH
-addr_a_segwit = rpc_connection.getnewaddress("Address A SegWit", "p2sh-segwit")
-addr_b_segwit = rpc_connection.getnewaddress("Address B SegWit", "p2sh-segwit")
-addr_c_segwit = rpc_connection.getnewaddress("Address C SegWit", "p2sh-segwit")
+addr_a = rpc_connection.getnewaddress("Address A", "p2sh-segwit")
+addr_b = rpc_connection.getnewaddress("Address B", "p2sh-segwit")
+addr_c = rpc_connection.getnewaddress("Address C", "p2sh-segwit")
 
-print(f"Address A' (P2SH-SegWit): {addr_a_segwit}")
-print(f"Address B' (P2SH-SegWit): {addr_b_segwit}")
-print(f"Address C' (P2SH-SegWit): {addr_c_segwit}")
+print(f"Address A (P2SH-SegWit): {addr_a}")
+print(f"Address B (P2SH-SegWit): {addr_b}")
+print(f"Address C (P2SH-SegWit): {addr_c}")
 
-# Get a mining address for block generation
-mining_address = rpc_connection.getnewaddress("Mining Address", "legacy")
+# Generate some blocks to get coins (only in regtest)
+if rpc_connection.getblockchaininfo()['chain'] == 'regtest':
+    mining_address = rpc_connection.getnewaddress("Mining Address", "legacy")
+    rpc_connection.generatetoaddress(101, mining_address)
+    print(f"Generated 101 blocks to {mining_address}")
 
-# Fund address A'
+# Fund address A
 funding_amount = 1.0  # BTC
-txid_fund = rpc_connection.sendtoaddress(addr_a_segwit, funding_amount)
-print(f"Funded Address A' with {funding_amount} BTC, TXID: {txid_fund}")
+txid_fund = rpc_connection.sendtoaddress(addr_a, funding_amount)
+print(f"Funded Address A with {funding_amount} BTC, TXID: {txid_fund}")
 
 # Mine a block to confirm the funding transaction
 rpc_connection.generatetoaddress(1, mining_address)
 print("Mined 1 block to confirm funding transaction")
 
-# List unspent transactions for address A'
-unspent = rpc_connection.listunspent(1, 9999999, [addr_a_segwit])
+# List unspent transactions for address A
+unspent = rpc_connection.listunspent(1, 9999999, [addr_a])
 if not unspent:
-    print("No unspent outputs found for address A'!")
+    print("No unspent outputs found for address A!")
     exit(1)
 
-# Select the UTXO from address A'
+# Select the UTXO from address A
 utxo = unspent[0]
 print(f"Using UTXO: {utxo['txid']} with amount {utxo['amount']} BTC")
 
 # Create a raw transaction
-# Use Decimal for the fee to match the type returned by RPC
-amount_to_send = utxo['amount'] - Decimal('0.0001')  # Subtract a small fee
 raw_tx = rpc_connection.createrawtransaction(
     [{"txid": utxo['txid'], "vout": utxo['vout']}],
-    {addr_b_segwit: float(amount_to_send)}  # Convert back to float for createrawtransaction
+    {addr_b: float(utxo['amount'])}  # Send the full amount, let Bitcoin Core calculate the fee
 )
 
-# Decode the raw transaction to analyze it
-decoded_tx = rpc_connection.decoderawtransaction(raw_tx)
-print("\nDecoded Raw Transaction:")
+# Fund the raw transaction (let Bitcoin Core add the fee)
+funded_tx = rpc_connection.fundrawtransaction(raw_tx, {"conf_target": 6})
+raw_tx_funded = funded_tx['hex']
+fee_amount = funded_tx['fee']
+
+print(f"\nEstimated fee for txconfirmtarget=6: {fee_amount} BTC")
+
+# Decode the funded raw transaction
+decoded_tx = rpc_connection.decoderawtransaction(raw_tx_funded)
+print("\nDecoded Funded Raw Transaction:")
 print(f"Transaction ID: {decoded_tx['txid']}")
 print(f"Input TXID: {decoded_tx['vin'][0]['txid']}")
 print(f"Output address: {decoded_tx['vout'][0]['scriptPubKey']['address']}")
 print(f"Output amount: {decoded_tx['vout'][0]['value']} BTC")
-print(f"ScriptPubKey (Locking Script) for Address B': {decoded_tx['vout'][0]['scriptPubKey']['hex']}")
-print(f"ScriptPubKey ASM: {decoded_tx['vout'][0]['scriptPubKey']['asm']}")
-print(f"Script type: {decoded_tx['vout'][0]['scriptPubKey']['type']}")
 
 # Sign the transaction
-signed_tx = rpc_connection.signrawtransactionwithwallet(raw_tx)
+signed_tx = rpc_connection.signrawtransactionwithwallet(raw_tx_funded)
 if signed_tx['complete']:
     print("\nTransaction signed successfully!")
 else:
@@ -88,17 +89,17 @@ else:
 
 # Broadcast the transaction
 tx_id = rpc_connection.sendrawtransaction(signed_tx['hex'])
-print(f"\nTransaction from A' to B' broadcasted with TXID: {tx_id}")
+print(f"\nTransaction from A to B broadcasted with TXID: {tx_id}")
 
 # Mine a block to confirm the transaction
 rpc_connection.generatetoaddress(1, mining_address)
-print("Mined 1 block to confirm A' to B' transaction")
+print("Mined 1 block to confirm A to B transaction")
 
-# Save transaction details for use in the next script
+# Save transaction details
 with open("Segwit_transaction_details.txt", "w") as f:
-    f.write(f"TXID_A_TO_B_SEGWIT={tx_id}\n")
-    f.write(f"ADDR_B_SEGWIT={addr_b_segwit}\n")
-    f.write(f"ADDR_C_SEGWIT={addr_c_segwit}\n")
+    f.write(f"TXID_A_TO_B={tx_id}\n")
+    f.write(f"ADDR_B={addr_b}\n")
+    f.write(f"ADDR_C={addr_c}\n")
 
 print("\nTransaction details saved to Segwit_transaction_details.txt")
-print("\nTransaction from A' to B' completed successfully!")
+print("\nTransaction from A to B completed successfully!")

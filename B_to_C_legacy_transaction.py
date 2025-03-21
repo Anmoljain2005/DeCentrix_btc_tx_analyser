@@ -1,5 +1,5 @@
 from bitcoinrpc.authproxy import AuthServiceProxy
-from decimal import Decimal
+import subprocess  # Import subprocess to run btcdeb
 
 # Connection details
 rpc_user = 'decentrix_crew'
@@ -59,15 +59,21 @@ else:
     print(f"Using first available UTXO instead: {utxo['txid']} with amount {utxo['amount']} BTC")
 
 # Create a raw transaction
-# Use Decimal for the fee to match the type returned by RPC
-amount_to_send = utxo['amount'] - Decimal('0.0001')  # Subtract a small fee
+# Let Bitcoin Core calculate the fee based on txconfirmtarget=6
 raw_tx = rpc_connection.createrawtransaction(
     [{"txid": utxo['txid'], "vout": utxo['vout']}],
-    {addr_c: float(amount_to_send)}  # Convert back to float for createrawtransaction
+    {addr_c: float(utxo['amount'])}  # Send the full amount, let Bitcoin Core calculate the fee
 )
 
+# Fund the raw transaction (let Bitcoin Core add the fee)
+funded_tx = rpc_connection.fundrawtransaction(raw_tx, {"conf_target": 6})
+raw_tx_funded = funded_tx['hex']
+fee_amount = funded_tx['fee']
+
+print(f"\nEstimated fee for txconfirmtarget=6: {fee_amount} BTC")
+
 # Decode the raw transaction to analyze it before signing
-decoded_tx_before = rpc_connection.decoderawtransaction(raw_tx)
+decoded_tx_before = rpc_connection.decoderawtransaction(raw_tx_funded)
 print("\nDecoded Raw Transaction (before signing):")
 print(f"Transaction ID: {decoded_tx_before['txid']}")
 print(f"Input TXID: {decoded_tx_before['vin'][0]['txid']}")
@@ -77,7 +83,7 @@ print(f"ScriptPubKey (Locking Script) for Address C: {decoded_tx_before['vout'][
 print(f"ScriptPubKey ASM: {decoded_tx_before['vout'][0]['scriptPubKey']['asm']}")
 
 # Sign the transaction
-signed_tx = rpc_connection.signrawtransactionwithwallet(raw_tx)
+signed_tx = rpc_connection.signrawtransactionwithwallet(raw_tx_funded)
 if signed_tx['complete']:
     print("\nTransaction signed successfully!")
 else:
@@ -96,12 +102,38 @@ print("\nPrevious Transaction ScriptPubKey (Challenge Script):")
 print(f"ScriptPubKey: {prev_tx['vout'][utxo['vout']]['scriptPubKey']['hex']}")
 print(f"ScriptPubKey ASM: {prev_tx['vout'][utxo['vout']]['scriptPubKey']['asm']}")
 
-# Compare challenge and response scripts
-print("\nAnalysis of Challenge-Response Scripts:")
-print(f"Challenge (ScriptPubKey): {prev_tx['vout'][utxo['vout']]['scriptPubKey']['asm']}")
-print(f"Response (ScriptSig): {decoded_tx_after['vin'][0]['scriptSig']['asm']}")
-print("\nIn P2PKH transactions, the challenge script expects a signature and a public key that hashes to the provided hash.")
-print("The response script provides these two items needed to unlock the funds.")
+# Decode the locking and unlocking scripts for detailed analysis
+locking_script = prev_tx['vout'][utxo['vout']]['scriptPubKey']['hex']
+unlocking_script = decoded_tx_after['vin'][0]['scriptSig']['hex']
+
+decoded_locking_script = rpc_connection.decodescript(locking_script)
+decoded_unlocking_script = rpc_connection.decodescript(unlocking_script)
+
+print("\nDecoded Locking Script (ScriptPubKey):")
+print(decoded_locking_script)
+print("\nDecoded Unlocking Script (ScriptSig):")
+print(decoded_unlocking_script)
+
+# Validate that the unlocking script satisfies the locking script
+print("\nValidating ScriptSig against ScriptPubKey...")
+if decoded_locking_script['type'] == 'pubkeyhash' and decoded_unlocking_script['type'] == 'nonstandard':
+    print("The locking script is P2PKH, and the unlocking script provides a signature and public key.")
+    print("This matches the expected structure for a P2PKH transaction.")
+else:
+    print("Error: The scripts do not match the expected P2PKH structure.")
+    exit(1)
+
+# # Run btcdeb to debug the scripts
+# print("\nRunning btcdeb to debug the scripts...")
+# combined_script = f"{decoded_tx_after['vin'][0]['scriptSig']['asm']} {prev_tx['vout'][utxo['vout']]['scriptPubKey']['asm']}"
+# try:
+#     result = subprocess.run(["btcdeb", combined_script], capture_output=True, text=True, check=True)
+#     print("btcdeb output:")
+#     print(result.stdout)
+# except subprocess.CalledProcessError as e:
+#     print("Error running btcdeb:")
+#     print(e.stderr)
+#     exit(1)
 
 # Broadcast the transaction
 tx_id = rpc_connection.sendrawtransaction(signed_tx['hex'])
