@@ -1,4 +1,5 @@
 from bitcoinrpc.authproxy import AuthServiceProxy
+from decimal import Decimal
 
 # Connection details
 rpc_user = 'decentrix_crew'
@@ -18,7 +19,7 @@ try:
             key, value = line.strip().split("=", 1)
             tx_details[key] = value
     
-    txid_a_to_b = tx_details["TXID_A_TO_B"]
+    txid_a_to_b = tx_details["TXID_A_TO_B_LEGACY"]
     addr_b = tx_details["ADDR_B"]
     addr_c = tx_details["ADDR_C"]
     
@@ -57,31 +58,32 @@ else:
     utxo = unspent[0]
     print(f"Using first available UTXO instead: {utxo['txid']} with amount {utxo['amount']} BTC")
 
+# Define the transaction fee (from regtest parameters)
+transaction_fee = Decimal('0.0001')  # paytxfee=0.0001
+
+# Calculate amounts after deducting the fee
+remaining_amount = utxo['amount'] - transaction_fee
+amount_to_send_c = remaining_amount * Decimal('0.5')  # 50% to C
+amount_to_send_b = remaining_amount * Decimal('0.5')  # 50% back to B
+
 # Create a raw transaction
 raw_tx = rpc_connection.createrawtransaction(
     [{"txid": utxo['txid'], "vout": utxo['vout']}],
-    {addr_c: float(utxo['amount'])}  # Send the full amount, let Bitcoin Core calculate the fee
+    {addr_c: float(amount_to_send_c), addr_b: float(amount_to_send_b)}  # Send to C and B
 )
 
-# Fund the raw transaction (let Bitcoin Core add the fee)
-funded_tx = rpc_connection.fundrawtransaction(raw_tx, {"conf_target": 6})
-raw_tx_funded = funded_tx['hex']
-fee_amount = funded_tx['fee']
-
-print(f"\nEstimated fee for txconfirmtarget=6: {fee_amount} BTC")
-
 # Decode the raw transaction to analyze it before signing
-decoded_tx_before = rpc_connection.decoderawtransaction(raw_tx_funded)
+decoded_tx_before = rpc_connection.decoderawtransaction(raw_tx)
 print("\nDecoded Raw Transaction (before signing):")
 print(f"Transaction ID: {decoded_tx_before['txid']}")
 print(f"Input TXID: {decoded_tx_before['vin'][0]['txid']}")
-print(f"Output address: {decoded_tx_before['vout'][0]['scriptPubKey']['address']}")
-print(f"Output amount: {decoded_tx_before['vout'][0]['value']} BTC")
-print(f"ScriptPubKey (Locking Script) for Address C: {decoded_tx_before['vout'][0]['scriptPubKey']['hex']}")
-print(f"ScriptPubKey ASM: {decoded_tx_before['vout'][0]['scriptPubKey']['asm']}")
+print(f"Output to Address C: {decoded_tx_before['vout'][0]['scriptPubKey']['address']}")
+print(f"Output to Address C amount: {decoded_tx_before['vout'][0]['value']} BTC")
+print(f"Output to Address B: {decoded_tx_before['vout'][1]['scriptPubKey']['address']}")
+print(f"Output to Address B amount: {decoded_tx_before['vout'][1]['value']} BTC")
 
 # Sign the transaction
-signed_tx = rpc_connection.signrawtransactionwithwallet(raw_tx_funded)
+signed_tx = rpc_connection.signrawtransactionwithwallet(raw_tx)
 if signed_tx['complete']:
     print("\nTransaction signed successfully!")
 else:
@@ -121,12 +123,16 @@ else:
     print("Error: The scripts do not match the expected P2PKH structure.")
     exit(1)
 
+# Get the transaction virtual size for analysis
+tx_size = len(signed_tx['hex']) // 2  # hex string to bytes
+print(f"\nTransaction size in bytes: {tx_size}")
+
 # Broadcast the transaction
 tx_id = rpc_connection.sendrawtransaction(signed_tx['hex'])
-print(f"\nTransaction from B to C broadcasted with TXID: {tx_id}")
+print(f"\nTransaction from B to C and back to B broadcasted with TXID: {tx_id}")
 
 # Mine a block to confirm the transaction
 rpc_connection.generatetoaddress(1, mining_address)
-print("Mined 1 block to confirm B to C transaction")
+print("Mined 1 block to confirm B to C and back to B transaction")
 
-print("\nTransaction from B to C completed successfully!")
+print("\nTransaction from B to C and back to B completed successfully!")

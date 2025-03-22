@@ -197,7 +197,7 @@ To validate the correctness of the **challenge and response scripts**, you can u
      ```  
      Example:  
      ```bash
-     btcdeb -v ['3044022051941caacc410b9c7915bc64f68d063b6b83bcb3de869e9fa86290c05856392e02203567b8100e0fd3d75ad8554e52ea22a636169167195be92ee75c4f641ca2f2ad01 031a60a21ad8396e2c1c2666af6913e2c78222203374c087c5cb419e2796119efe OP_DUP OP_HASH160 328bf4de42d6440fb40a4e059b747a12ac200200 OP_EQUALVERIFY OP_CHECKSIG']
+     btcdeb -v ['304402203e7768e344e2afdad63f48d13501b8f9f8104d9e3dbeadff8b580ad2b1fae251022039fae209ffebf64f4adbddec8196b5760518e8edb0132dbccbaf8013544acbfb01 031434c9e53065a36ab1b41ea6abb4c554568b0204e5a6de90bdf8959002f849aa OP_DUP OP_HASH160 2a42ffdb7d2bffb06d66932a0aa3968fd8194d44 OP_EQUALVERIFY OP_CHECKSIG']
      ```  
 
    - For **SegWit (P2SH-P2WPKH)** transactions:  
@@ -206,7 +206,7 @@ To validate the correctness of the **challenge and response scripts**, you can u
      ```  
      Example:  
      ```bash
-     btcdeb -v ['3044022021349fd89b241c7b941578eb4ea19ae6c7c6cc87bf03df45aaae117274ae3b7202203295fe0f573d269415875d0d8c4aa0172b7ec45184727dd8e3b3ce672f803b2b01 02a2c515987cacb121201e916c4fa8e6982fc34e8d92b1d057d1694524c1f8b23d OP_HASH160 55d9aee5cce467721910c2a9fb3e5c20070bec76 OP_EQUAL']
+     btcdeb -v ['304402200c5c2c9b18dd6e5498f47fa82f717f13ce58b04b7af7bc52b3d8fd93d9e4cb4f02204c93d603ee397fc454217bde303be28f1e7ce1da687e566b2ac7c6e6c64e141601 0363d2aa56275c96dec54bcc34ee0b60b7e0383d4f0037966a17388f45ecc97fbc OP_HASH160 a149328683048f0e38d3b94c71e2895c363d315f OP_EQUAL']
      ```  
 
 3. **Analyze the Output**  

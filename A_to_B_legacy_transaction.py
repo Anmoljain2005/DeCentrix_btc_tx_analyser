@@ -1,4 +1,5 @@
 from bitcoinrpc.authproxy import AuthServiceProxy
+from decimal import Decimal
 
 # Connection details
 rpc_user = 'decentrix_crew'
@@ -12,9 +13,11 @@ rpc_connection = AuthServiceProxy(f"http://{rpc_user}:{rpc_password}@{rpc_host}:
 # Create or load wallet
 wallet_name = "DeCentrixStore"
 try:
+    # Try to create a new wallet
     rpc_connection.createwallet(wallet_name)
     print(f"Created new wallet: {wallet_name}")
 except Exception as e:
+    # If wallet already exists, load it
     if "already exists" in str(e):
         print(f"Wallet {wallet_name} already exists, loading it...")
         rpc_connection.loadwallet(wallet_name)
@@ -35,6 +38,7 @@ print(f"Address C (Legacy): {addr_c}")
 
 # Generate some blocks to get coins (only in regtest)
 if rpc_connection.getblockchaininfo()['chain'] == 'regtest':
+    # Mine blocks to an address in our wallet to get coins
     mining_address = rpc_connection.getnewaddress("Mining Address", "legacy")
     rpc_connection.generatetoaddress(101, mining_address)
     print(f"Generated 101 blocks to {mining_address}")
@@ -58,29 +62,32 @@ if not unspent:
 utxo = unspent[0]
 print(f"Using UTXO: {utxo['txid']} with amount {utxo['amount']} BTC")
 
+# Define the transaction fee (from regtest parameters)
+transaction_fee = Decimal('0.0001')  # paytxfee=0.0001
+
+# Calculate amounts after deducting the fee
+remaining_amount = utxo['amount'] - transaction_fee
+amount_to_send_b = remaining_amount * Decimal('0.7')  # 70% to B
+amount_to_send_a = remaining_amount * Decimal('0.3')  # 30% back to A
+
 # Create a raw transaction
 raw_tx = rpc_connection.createrawtransaction(
     [{"txid": utxo['txid'], "vout": utxo['vout']}],
-    {addr_b: float(utxo['amount'])}  # Send the full amount, let Bitcoin Core calculate the fee
+    {addr_b: float(amount_to_send_b), addr_a: float(amount_to_send_a)}  # Send to B and A
 )
 
-# Fund the raw transaction (let Bitcoin Core add the fee)
-funded_tx = rpc_connection.fundrawtransaction(raw_tx, {"conf_target": 6})
-raw_tx_funded = funded_tx['hex']
-fee_amount = funded_tx['fee']
-
-print(f"\nEstimated fee for txconfirmtarget=6: {fee_amount} BTC")
-
-# Decode the funded raw transaction
-decoded_tx = rpc_connection.decoderawtransaction(raw_tx_funded)
-print("\nDecoded Funded Raw Transaction:")
+# Decode the raw transaction to analyze it
+decoded_tx = rpc_connection.decoderawtransaction(raw_tx)
+print("\nDecoded Raw Transaction:")
 print(f"Transaction ID: {decoded_tx['txid']}")
 print(f"Input TXID: {decoded_tx['vin'][0]['txid']}")
-print(f"Output address: {decoded_tx['vout'][0]['scriptPubKey']['address']}")
-print(f"Output amount: {decoded_tx['vout'][0]['value']} BTC")
+print(f"Output to Address B: {decoded_tx['vout'][0]['scriptPubKey']['address']}")
+print(f"Output to Address B amount: {decoded_tx['vout'][0]['value']} BTC")
+print(f"Output to Address A: {decoded_tx['vout'][1]['scriptPubKey']['address']}")
+print(f"Output to Address A amount: {decoded_tx['vout'][1]['value']} BTC")
 
 # Sign the transaction
-signed_tx = rpc_connection.signrawtransactionwithwallet(raw_tx_funded)
+signed_tx = rpc_connection.signrawtransactionwithwallet(raw_tx)
 if signed_tx['complete']:
     print("\nTransaction signed successfully!")
 else:
@@ -89,17 +96,17 @@ else:
 
 # Broadcast the transaction
 tx_id = rpc_connection.sendrawtransaction(signed_tx['hex'])
-print(f"\nTransaction from A to B broadcasted with TXID: {tx_id}")
+print(f"\nTransaction from A to B and back to A broadcasted with TXID: {tx_id}")
 
 # Mine a block to confirm the transaction
 rpc_connection.generatetoaddress(1, mining_address)
-print("Mined 1 block to confirm A to B transaction")
+print("Mined 1 block to confirm A to B and back to A transaction")
 
-# Save transaction details
+# Save transaction details for use in the next script
 with open("Legacy_transaction_details.txt", "w") as f:
-    f.write(f"TXID_A_TO_B={tx_id}\n")
+    f.write(f"TXID_A_TO_B_LEGACY={tx_id}\n")
     f.write(f"ADDR_B={addr_b}\n")
     f.write(f"ADDR_C={addr_c}\n")
 
 print("\nTransaction details saved to Legacy_transaction_details.txt")
-print("\nTransaction from A to B completed successfully!")
+print("\nTransaction from A to B and back to A completed successfully!")

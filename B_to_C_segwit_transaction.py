@@ -1,4 +1,5 @@
 from bitcoinrpc.authproxy import AuthServiceProxy
+from decimal import Decimal
 
 # Connection details
 rpc_user = 'decentrix_crew'
@@ -18,9 +19,9 @@ try:
             key, value = line.strip().split("=", 1)
             tx_details[key] = value
     
-    txid_a_to_b = tx_details["TXID_A_TO_B"]
-    addr_b = tx_details["ADDR_B"]
-    addr_c = tx_details["ADDR_C"]
+    txid_a_to_b = tx_details["TXID_A_TO_B_SEGWIT"]
+    addr_b = tx_details["ADDR_B_SEGWIT"]
+    addr_c = tx_details["ADDR_C_SEGWIT"]
     
     print(f"Loaded transaction details from file:")
     print(f"TXID A' to B': {txid_a_to_b}")
@@ -45,46 +46,47 @@ if not unspent:
         exit(1)
 
 # Find the specific UTXO from the A' to B' transaction
-utxo = None
-for u in unspent:
-    if u['txid'] == txid_a_to_b:
-        utxo = u
+for utxo in unspent:
+    if utxo['txid'] == txid_a_to_b:
         print(f"Found UTXO from A' to B' transaction: {utxo['txid']} with amount {utxo['amount']} BTC")
         break
 else:
     print(f"Could not find UTXO with TXID {txid_a_to_b}. Available UTXOs:")
-    for u in unspent:
-        print(f"  TXID: {u['txid']}, Amount: {u['amount']} BTC")
+    for utxo in unspent:
+        print(f"  TXID: {utxo['txid']}, Amount: {utxo['amount']} BTC")
     # Use the first available UTXO as fallback
     utxo = unspent[0]
     print(f"Using first available UTXO instead: {utxo['txid']} with amount {utxo['amount']} BTC")
 
+# Define the transaction fee (from regtest parameters)
+transaction_fee = Decimal('0.0001')  # paytxfee=0.0001
+
+# Calculate amounts after deducting the fee
+remaining_amount = utxo['amount'] - transaction_fee
+amount_to_send_c = remaining_amount * Decimal('0.5')  # 50% to C'
+amount_to_send_b = remaining_amount * Decimal('0.5')  # 50% back to B'
+
 # Create a raw transaction
 raw_tx = rpc_connection.createrawtransaction(
     [{"txid": utxo['txid'], "vout": utxo['vout']}],
-    {addr_c: float(utxo['amount'])}  # Send the full amount, let Bitcoin Core calculate the fee
+    {addr_c: float(amount_to_send_c), addr_b: float(amount_to_send_b)}  # Send to C' and B'
 )
 
-# Fund the raw transaction (let Bitcoin Core add the fee)
-funded_tx = rpc_connection.fundrawtransaction(raw_tx, {"conf_target": 6})
-funded_raw_tx = funded_tx['hex']
-fee_amount = funded_tx['fee']
-
-print(f"\nEstimated fee for txconfirmtarget=6: {fee_amount} BTC")
-
 # Decode the raw transaction to analyze it before signing
-decoded_tx_before = rpc_connection.decoderawtransaction(funded_raw_tx)
+decoded_tx_before = rpc_connection.decoderawtransaction(raw_tx)
 print("\nDecoded Raw Transaction (before signing):")
 print(f"Transaction ID: {decoded_tx_before['txid']}")
 print(f"Input TXID: {decoded_tx_before['vin'][0]['txid']}")
-print(f"Output address: {decoded_tx_before['vout'][0]['scriptPubKey']['address']}")
-print(f"Output amount: {decoded_tx_before['vout'][0]['value']} BTC")
+print(f"Output to Address C': {decoded_tx_before['vout'][0]['scriptPubKey']['address']}")
+print(f"Output to Address C' amount: {decoded_tx_before['vout'][0]['value']} BTC")
+print(f"Output to Address B': {decoded_tx_before['vout'][1]['scriptPubKey']['address']}")
+print(f"Output to Address B' amount: {decoded_tx_before['vout'][1]['value']} BTC")
 print(f"ScriptPubKey (Locking Script) for Address C': {decoded_tx_before['vout'][0]['scriptPubKey']['hex']}")
 print(f"ScriptPubKey ASM: {decoded_tx_before['vout'][0]['scriptPubKey']['asm']}")
 print(f"Script type: {decoded_tx_before['vout'][0]['scriptPubKey']['type']}")
 
 # Sign the transaction
-signed_tx = rpc_connection.signrawtransactionwithwallet(funded_raw_tx)
+signed_tx = rpc_connection.signrawtransactionwithwallet(raw_tx)
 if signed_tx['complete']:
     print("\nTransaction signed successfully!")
 else:
@@ -126,15 +128,16 @@ if 'txinwitness' in decoded_tx_after['vin'][0]:
     print("This reduces the transaction size and fixes transaction malleability issues")
 
 # Get the transaction virtual size for analysis
-tx_size = len(signed_tx['hex']) // 2  # hex string to bytes
-print(f"\nTransaction size in bytes: {tx_size}")
+tx_weight = decoded_tx_after['weight']
+tx_virtual_size = (tx_weight + 3) // 4  # Virtual size formula
+print(f"Transaction virtual size: {tx_virtual_size} bytes")
 
 # Broadcast the transaction
 tx_id = rpc_connection.sendrawtransaction(signed_tx['hex'])
-print(f"\nTransaction from B' to C' broadcasted with TXID: {tx_id}")
+print(f"\nTransaction from B' to C' and back to B' broadcasted with TXID: {tx_id}")
 
 # Mine a block to confirm the transaction
 rpc_connection.generatetoaddress(1, mining_address)
-print("Mined 1 block to confirm B' to C' transaction")
+print("Mined 1 block to confirm B' to C' and back to B' transaction")
 
-print("\nTransaction from B' to C' completed successfully!")
+print("\nTransaction from B' to C' and back to B' completed successfully!")
