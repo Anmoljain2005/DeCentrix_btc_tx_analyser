@@ -191,9 +191,9 @@ To validate the correctness of the **challenge and response scripts**, you can u
 
 2. **Run `btcdeb`**  
    - Once logged in, use the `btcdeb` command to debug your scripts.  
-   ```bash
+     ```bash
      btcdeb --tx=<transaction_hex> --txin=<input_hex>
-   ```
+     ```
 
 Here:
 - `<transaction_hex>` is the full hexadecimal representation of your transaction.
