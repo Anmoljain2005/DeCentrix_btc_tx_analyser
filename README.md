@@ -232,6 +232,8 @@ The report includes:
 - Analysis of the script structures and how they validate transactions.  
 - Screenshots of decoded scripts and Bitcoin debugger execution.  
 
+Link to Report : [https://docs.google.com/document/d/1ZXuYcww5NFc7y2AYrnwm4Kw_Q5YuM4KUVTFSEqJQt40/edit?usp=sharing](https://docs.google.com/document/d/1ZXuYcww5NFc7y2AYrnwm4Kw_Q5YuM4KUVTFSEqJQt40/edit?usp=sharing)
+
 ---
 
 ## Contributors
