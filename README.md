@@ -191,25 +191,34 @@ To validate the correctness of the **challenge and response scripts**, you can u
 
 2. **Run `btcdeb`**  
    - Once logged in, use the `btcdeb` command to debug your scripts.  
-   - For **Legacy (P2PKH)** transactions:  
-     ```bash
-     btcdeb -v ['<unlocking_script> <locking_script>']
-     ```  
-     Example:  
-     ```bash
-     btcdeb -v ['304402203e7768e344e2afdad63f48d13501b8f9f8104d9e3dbeadff8b580ad2b1fae251022039fae209ffebf64f4adbddec8196b5760518e8edb0132dbccbaf8013544acbfb01 031434c9e53065a36ab1b41ea6abb4c554568b0204e5a6de90bdf8959002f849aa OP_DUP OP_HASH160 2a42ffdb7d2bffb06d66932a0aa3968fd8194d44 OP_EQUALVERIFY OP_CHECKSIG']
-     ```  
+   ```bash
+     btcdeb --tx=<transaction_hex> --txin=<input_hex>
+   ```
 
-   - For **SegWit (P2SH-P2WPKH)** transactions:  
-     ```bash
-     btcdeb -v ['<witness_item_0> <witness_item_1> <locking_script>']
-     ```  
-     Example:  
-     ```bash
-     btcdeb -v ['304402200c5c2c9b18dd6e5498f47fa82f717f13ce58b04b7af7bc52b3d8fd93d9e4cb4f02204c93d603ee397fc454217bde303be28f1e7ce1da687e566b2ac7c6e6c64e141601 0363d2aa56275c96dec54bcc34ee0b60b7e0383d4f0037966a17388f45ecc97fbc OP_HASH160 a149328683048f0e38d3b94c71e2895c363d315f OP_EQUAL']
-     ```  
+Here:
+- `<transaction_hex>` is the full hexadecimal representation of your transaction.
+- `<input_hex>` is the hex of the previous transaction output being spent.
 
-3. **Analyze the Output**  
+3. **Step Through the Script**
+Use `btcdeb` commands to analyze each step of script execution:
+
+- **Step through instructions:**
+  ```bash
+  btcdeb> step
+  ```
+- **View the stack:**
+  ```bash
+  btcdeb> stack
+  ```
+- **Print the full script:**
+  ```bash
+  btcdeb> print
+  ```
+
+The debugger will show how data is pushed onto the stack and how operations like `OP_DUP`, `OP_HASH160`, `OP_EQUALVERIFY`, and `OP_CHECKSIG` are executed.
+
+
+4. **Analyze the Output**  
    - The debugger will simulate the execution of the script step by step.  
    - If the script is valid, the final stack will contain `1` (true).  
    - If the script is invalid, the debugger will highlight the error.  

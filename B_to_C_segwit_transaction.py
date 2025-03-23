@@ -132,6 +132,15 @@ tx_weight = decoded_tx_after['weight']
 tx_virtual_size = (tx_weight + 3) // 4  # Virtual size formula
 print(f"Transaction virtual size: {tx_virtual_size} bytes")
 
+# Get the hex of the signed transaction
+transaction_hex = signed_tx['hex']
+# Get the previous transaction to extract the input hex
+input_hex = prev_tx['hex']  # This is the raw hex of the previous transaction
+
+# Print both hex values
+print(f"Input Transaction Hex (previous): {input_hex}")
+print(f"Current Transaction Hex (signed): {transaction_hex}")
+
 # Broadcast the transaction
 tx_id = rpc_connection.sendrawtransaction(signed_tx['hex'])
 print(f"\nTransaction from B' to C' and back to B' broadcasted with TXID: {tx_id}")

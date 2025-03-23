@@ -1,0 +1,75 @@
+PS C:\Users\Anmol jain> & "C:/Users/Anmol jain/AppData/Local/Programs/Python/Python312/python.exe" d:/Projects/DeCentrix_btc_tx_analyser/A_to_B_segwit_transaction.py
+Wallet DeCentrixStore loaded successfully.
+Address A' (P2SH-SegWit): 2MxLGR3AXPVEgVztsKwu6Rca8JHVR8Dy2Wg
+Address B' (P2SH-SegWit): 2NBy5Ggwdo4W8z4DwRhMCPBxmQQ5KhjYR3u
+Address C' (P2SH-SegWit): 2NEHuGZukEBG7jG1yCQYmSowchG1VxGZm2g
+Funded Address A' with 1.0 BTC, TXID: 98797b38cb4e61e66ff150120aee3464924aa47e6a1302fa994653a08aaf8079
+Mined 1 block to confirm funding transaction
+Using UTXO: 98797b38cb4e61e66ff150120aee3464924aa47e6a1302fa994653a08aaf8079 with amount 1.00000000 BTC
+
+Decoded Raw Transaction:
+Transaction ID: ca4546ff0f50f08123f17945aeeda59311cbaf788065b8990b8bba199741e6ca
+Input TXID: 98797b38cb4e61e66ff150120aee3464924aa47e6a1302fa994653a08aaf8079
+Output to Address B': 2NBy5Ggwdo4W8z4DwRhMCPBxmQQ5KhjYR3u
+Output to Address B' amount: 0.69993000 BTC
+Output to Address A': 2MxLGR3AXPVEgVztsKwu6Rca8JHVR8Dy2Wg
+Output to Address A' amount: 0.29997000 BTC
+ScriptPubKey (Locking Script) for Address B': a914cd5c75321d3ab5fc87ab7a8afc59a266c276e34387
+ScriptPubKey ASM: OP_HASH160 cd5c75321d3ab5fc87ab7a8afc59a266c276e343 OP_EQUAL
+Script type: scripthash
+
+Transaction signed successfully!
+
+Transaction from A' to B' and back to A' broadcasted with TXID: f534985fc48c2da409e56071644f961d55bcfcbe2c01d82b3f5d8f6954c978a9
+Mined 1 block to confirm A' to B' and back to A' transaction
+
+Transaction details saved to Segwit_transaction_details.txt
+
+Transaction from A' to B' and back to A' completed successfully!
+PS C:\Users\Anmol jain> & "C:/Users/Anmol jain/AppData/Local/Programs/Python/Python312/python.exe" d:/Projects/DeCentrix_btc_tx_analyser/B_to_C_segwit_transaction.py
+Loaded transaction details from file:
+TXID A' to B': f534985fc48c2da409e56071644f961d55bcfcbe2c01d82b3f5d8f6954c978a9
+Address B': 2NBy5Ggwdo4W8z4DwRhMCPBxmQQ5KhjYR3u
+Address C': 2NEHuGZukEBG7jG1yCQYmSowchG1VxGZm2g
+Found UTXO from A' to B' transaction: f534985fc48c2da409e56071644f961d55bcfcbe2c01d82b3f5d8f6954c978a9 with amount 0.69993000 BTC
+
+Decoded Raw Transaction (before signing):
+Transaction ID: f151652b651804c1eb1e5828040b1e9324dd21e943bbb6fedc52693e13f5712b
+Input TXID: f534985fc48c2da409e56071644f961d55bcfcbe2c01d82b3f5d8f6954c978a9
+Output to Address C': 2NEHuGZukEBG7jG1yCQYmSowchG1VxGZm2g
+Output to Address C' amount: 0.34991500 BTC
+Output to Address B': 2NBy5Ggwdo4W8z4DwRhMCPBxmQQ5KhjYR3u
+Output to Address B' amount: 0.34991500 BTC
+ScriptPubKey (Locking Script) for Address C': a914e6dc4368773b2060bfc5567c91142c3f2fcb29a487
+ScriptPubKey ASM: OP_HASH160 e6dc4368773b2060bfc5567c91142c3f2fcb29a4 OP_EQUAL
+Script type: scripthash
+
+Transaction signed successfully!
+
+Decoded Signed Transaction (after signing):
+ScriptSig (Unlocking Script): 1600147e60553a9218bcf7faf17d0f17ebb2f7c9dbbd5c
+ScriptSig ASM: 00147e60553a9218bcf7faf17d0f17ebb2f7c9dbbd5c
+
+Witness data found (SegWit):
+Witness item 0: 3044022016896f4c83b6015b3977427947fc32a05eaca26837f509eea579a1dc298cd7a802206012a49b0ec45b1ea426cff81d90ed21150255c069bc617adcefc382779079df01
+Witness item 1: 02b3294e753ebc1f7635d7387c7e82fe3a5534ae833249c8c932982784a7a4dc03
+
+Previous Transaction ScriptPubKey (Challenge Script):
+ScriptPubKey: a914cd5c75321d3ab5fc87ab7a8afc59a266c276e34387
+ScriptPubKey ASM: OP_HASH160 cd5c75321d3ab5fc87ab7a8afc59a266c276e343 OP_EQUAL
+Script type: scripthash
+
+Analysis of Challenge-Response Scripts:
+Challenge (ScriptPubKey): OP_HASH160 cd5c75321d3ab5fc87ab7a8afc59a266c276e343 OP_EQUAL
+Response (ScriptSig): 00147e60553a9218bcf7faf17d0f17ebb2f7c9dbbd5c
+
+In P2SH-P2WPKH (SegWit) transactions, the signature and public key are moved to the witness data
+This reduces the transaction size and fixes transaction malleability issues
+Transaction virtual size: 166 bytes
+Input Transaction Hex (previous): 020000000001017980af8aa0534699fa02136a7ea44a926434ee0a1250f16fe6614ecb387b799800000000171600142e9726f02ff3356905032896917a4c748b0fba31fdffffff0228022c040000000017a914cd5c75321d3ab5fc87ab7a8afc59a266c276e34387c8b7c9010000000017a91437ccbc093140be9f9e727bc60608e779799cc43b870247304402205758e105d6773cb90ddc2a7a2de1c1625582afa231e051d7fee6f159dfa2da3a0220154bfaee37314925b57eb87ff625274eede5575f9cbf94e04c03813e3948df21012103b0a384c1b7f606316d3952c3cdf8d40b1889a7a5d903bd8bcbd974cf73b3a94b00000000
+Current Transaction Hex (signed): 02000000000101a978c954698f5d3f2bd8012cbefcbc551d964f647160e509a42d8cc45f9834f500000000171600147e60553a9218bcf7faf17d0f17ebb2f7c9dbbd5cfdffffff028ced15020000000017a914e6dc4368773b2060bfc5567c91142c3f2fcb29a4878ced15020000000017a914cd5c75321d3ab5fc87ab7a8afc59a266c276e3438702473044022016896f4c83b6015b3977427947fc32a05eaca26837f509eea579a1dc298cd7a802206012a49b0ec45b1ea426cff81d90ed21150255c069bc617adcefc382779079df012102b3294e753ebc1f7635d7387c7e82fe3a5534ae833249c8c932982784a7a4dc0300000000
+
+Transaction from B' to C' and back to B' broadcasted with TXID: 25e18b664ffeaf31e04b2247c917ba30ebbbb2e8e42b03b266660e31be215e71
+Mined 1 block to confirm B' to C' and back to B' transaction
+
+Transaction from B' to C' and back to B' completed successfully!
